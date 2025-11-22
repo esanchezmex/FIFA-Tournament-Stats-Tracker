@@ -1,0 +1,5 @@
+# Keep secrets and local artifacts out of git
+.streamlit/secrets.toml
+__pycache__/
+*.pyc
+data/exports/

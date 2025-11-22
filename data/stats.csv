@@ -1,0 +1,11 @@
+game_id,player_id,xg,xga,dribble_success,key_passes,interceptions,tackles,result
+G1,P1,2.1,2.6,96.0,5,2,4,win
+G1,P2,2.6,2.1,93.0,6,2,3,loss
+G2,P2,4.1,3.6,93.0,6,4,3,win
+G2,P1,3.6,4.1,96.0,7,5,5,loss
+G3,P1,5.1,5.3,48.0,2,6,4,loss
+G3,P2,5.3,5.1,27.0,6,3,6,win
+G4,P1,5.6,5.3,56.0,5,3,4,win
+G4,P2,5.3,5.6,65.0,4,6,6,loss
+G5,P2,3.2,4.3,56.0,4,4,4,win
+G5,P1,4.3,3.2,48.0,4,4,8,loss

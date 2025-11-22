@@ -1,0 +1,7 @@
+game_id,round_name,player_a,player_b,allow_draw,played_at
+G1,test 1,P1,P2,True,2025-11-21T17:05:01.367259
+G2,test 2,P2,P1,True,2025-11-21T17:06:41.855207
+G3,test 3,P1,P2,True,2025-11-21T17:07:59.677926
+G4,test 4,P1,P2,True,2025-11-21T17:09:06.726539
+G5,test 5,P2,P1,True,2025-11-22T15:32:08.487037
+G6,test 6,P2,P1,True,
