@@ -1,4 +1,4 @@
-# FIFA Tourney Stats
+# FIFA Tournament Stats Tracker
 
 A simple 1v1 tournament tracker with a CLI and Streamlit UI. Stats are stored in Azure Blob Storage (CSV blobs) so multiple users can update a shared dataset.
 
