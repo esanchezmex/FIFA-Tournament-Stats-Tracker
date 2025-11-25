@@ -17,7 +17,7 @@ if not (AZURE_CONNECTION_STRING and AZURE_CONTAINER):
 
 HEADERS = {
     "players": ["player_id", "name", "created_at"],
-    "games": ["game_id", "round_name", "player_a", "player_b", "allow_draw", "played_at"],
+    "games": ["game_id", "round_name", "game_label", "player_a", "player_b", "allow_draw", "played_at"],
     "stats": [
         "game_id",
         "player_id",

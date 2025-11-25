@@ -33,7 +33,8 @@ def render_create_game():
 
     player_options = {f"{row['name']} ({row['player_id']})": row["player_id"] for _, row in players.iterrows()}
     with st.form("create_game", clear_on_submit=True):
-        round_name = st.text_input("Round name/label (ex: Group A - match 1, QF, etc.)")
+        round_name = st.text_input("Round name (ex: Group Stage, QF, SF, Final)")
+        game_label = st.text_input("Game label (ex: Group A - match 1)")
         col1, col2 = st.columns(2)
         with col1:
             player_a_label = st.selectbox("Player A", list(player_options.keys()))
@@ -44,7 +45,7 @@ def render_create_game():
         if submitted:
             player_a = player_options[player_a_label]
             player_b = player_options[player_b_label]
-            ok, msg = logic.add_game(round_name, player_a, player_b, allow_draw)
+            ok, msg = logic.add_game(round_name, game_label, player_a, player_b, allow_draw)
             if ok:
                 st.success(f"Created game {msg}")
             else:
@@ -59,10 +60,11 @@ def render_enter_stats():
         st.info("No unplayed games found.")
         return
 
-    options = {
-        f"{row['game_id']} - {row['round_name']} ({players.loc[row['player_a'], 'name']} vs {players.loc[row['player_b'], 'name']})": row
-        for _, row in unplayed.iterrows()
-    }
+    def format_game(row):
+        label = row.get("game_label", "") or row["game_id"]
+        return f"{row['game_id']} - {row['round_name']} - {label} ({players.loc[row['player_a'], 'name']} vs {players.loc[row['player_b'], 'name']})"
+
+    options = {format_game(row): row for _, row in unplayed.iterrows()}
     selected_label = st.selectbox("Select game", list(options.keys()))
     game = options[selected_label]
     pid_a, pid_b = game["player_a"], game["player_b"]
@@ -162,15 +164,25 @@ def render_visualizations():
 
     if "avg_xg_by_round" in insights:
         st.subheader("Average xG per game by round")
-        st.dataframe(insights["avg_xg_by_round"])
+        round_df = insights["avg_xg_by_round"]
+        st.bar_chart(round_df.set_index("round_name")["avg_xg_per_game"])
 
     if "avg_xg_by_stage" in insights:
         st.subheader("Average xG per game by stage")
-        st.dataframe(insights["avg_xg_by_stage"])
+        stage_df = insights["avg_xg_by_stage"]
+        st.bar_chart(stage_df.set_index("stage")["avg_xg_per_game"])
 
-    if "goals_minus_xg" in insights:
+    if "goals_minus_xg_under" in insights or "goals_minus_xg_over" in insights:
         st.subheader("Goals minus xG (under/over performance)")
-        st.dataframe(insights["goals_minus_xg"])
+        col1, col2 = st.columns(2)
+        if "goals_minus_xg_under" in insights:
+            with col1:
+                st.markdown("**Top 5 underperformers (lowest Goals - xG)**")
+                st.dataframe(insights["goals_minus_xg_under"])
+        if "goals_minus_xg_over" in insights:
+            with col2:
+                st.markdown("**Top 5 overperformers (highest Goals - xG)**")
+                st.dataframe(insights["goals_minus_xg_over"])
 
 
 def render_exports():

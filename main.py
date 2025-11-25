@@ -65,7 +65,8 @@ def create_game() -> None:
     if len(players) < 2:
         print("Need at least two players to create a game.")
         return
-    round_name = input_non_empty("Round name/label (ex: Group A - match 1, QF, etc.): ")
+    round_name = input_non_empty("Round name (ex: Group Stage, QF, SF, Final): ")
+    game_label = input_non_empty("Game label (ex: Group A - match 1): ")
     player_a = choose_player("Select player A by id: ")
     if not player_a:
         return
@@ -78,7 +79,7 @@ def create_game() -> None:
         print("Players must be different.")
     allow_draw_input = input("Allow draw? (y/n) ").strip().lower() or "y"
     allow_draw = allow_draw_input.startswith("y")
-    ok, msg = logic.add_game(round_name, player_a, player_b, allow_draw)
+    ok, msg = logic.add_game(round_name, game_label, player_a, player_b, allow_draw)
     print(f"Created game {msg}." if ok else msg)
 
 
@@ -89,7 +90,8 @@ def select_unplayed_game():
         return None
     print("Unplayed games:")
     for _, row in unplayed.iterrows():
-        print(f"{row['game_id']}: {row['round_name']} ({row['player_a']} vs {row['player_b']})")
+        label = row.get("game_label", "") or row["game_id"]
+        print(f"{row['game_id']}: {row['round_name']} - {label} ({row['player_a']} vs {row['player_b']})")
     while True:
         choice = input_non_empty("Select game id: ")
         match = unplayed[unplayed["game_id"] == choice]

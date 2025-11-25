@@ -39,12 +39,14 @@ def add_player(name: str) -> Tuple[bool, str]:
     return True, player_id
 
 
-def add_game(round_name: str, player_a: str, player_b: str, allow_draw: bool) -> Tuple[bool, str]:
+def add_game(round_name: str, game_label: str, player_a: str, player_b: str, allow_draw: bool) -> Tuple[bool, str]:
     players = list_players()
     if player_a == player_b:
         return False, "Players must be different."
     if not round_name.strip():
         return False, "Round name cannot be empty."
+    if not game_label.strip():
+        return False, "Game label cannot be empty."
     if player_a not in set(players["player_id"]) or player_b not in set(players["player_id"]):
         return False, "Invalid player id(s)."
     games = list_games()
@@ -52,6 +54,7 @@ def add_game(round_name: str, player_a: str, player_b: str, allow_draw: bool) ->
     new_row = {
         "game_id": game_id,
         "round_name": round_name.strip(),
+        "game_label": game_label.strip(),
         "player_a": player_a,
         "player_b": player_b,
         "allow_draw": allow_draw,
@@ -212,7 +215,12 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
     insights["avg_xg_by_round"] = round_df
 
     # Average xG per game by stage proxy (draw allowed => group)
-    game_totals["stage"] = game_totals["allow_draw"].apply(lambda x: "Group stage (draws allowed)" if x else "Knockout")
+    game_totals["allow_draw_flag"] = (
+        game_totals["allow_draw"].astype(str).str.lower().isin(["true", "1", "yes", "y"])
+    )
+    game_totals["stage"] = game_totals["allow_draw_flag"].apply(
+        lambda x: "Group stage (draws allowed)" if x else "Knockout"
+    )
     stage_df = (
         game_totals.groupby("stage")
         .agg(games=("game_id", "count"), avg_xg_per_game=("total_xg", "mean"))
@@ -227,8 +235,9 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
         perf = agg.copy()
         perf["goals_minus_xg"] = perf["goals_total"] - perf["total_xg"]
         perf = perf[["player_id", "name", "goals_total", "total_xg", "goals_minus_xg", "games_played", "wins"]]
-        perf = perf.sort_values("goals_minus_xg", ascending=False)
-        insights["goals_minus_xg"] = perf
+        perf_sorted = perf.sort_values("goals_minus_xg")
+        insights["goals_minus_xg_under"] = perf_sorted.head(5)
+        insights["goals_minus_xg_over"] = perf_sorted.tail(5).sort_values("goals_minus_xg", ascending=False)
 
     return insights
 
@@ -238,7 +247,7 @@ def export_summaries() -> str:
     boards = compute_leaderboards()
     if agg.empty:
         return "No stats to export."
-    out_dir = os.path.join(storage.DATA_DIR, "exports")
+    out_dir = os.path.join("data", "exports")
     os.makedirs(out_dir, exist_ok=True)
     agg.to_csv(os.path.join(out_dir, "player_summary.csv"), index=False)
 
