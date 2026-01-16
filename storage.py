@@ -62,7 +62,7 @@ def _read_blob(blob_name: str, header_cols: List[str]) -> pd.DataFrame:
     df = pd.read_csv(io.BytesIO(data))
     for col in header_cols:
         if col not in df.columns:
-            df[col] = []
+            df[col] = pd.NA
     return df[header_cols]
 
 
