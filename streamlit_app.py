@@ -197,6 +197,32 @@ def render_visualizations():
                 ).properties(height=300)
                 st.altair_chart(chart_over, use_container_width=True)
 
+    if "scatter_data" in insights:
+        st.divider()
+        st.subheader("Performance Analysis")
+        df_scatter = insights["scatter_data"]
+        col_s1, col_s2 = st.columns(2)
+
+        with col_s1:
+            st.markdown("**xG vs. xGA (Expected Contributions)**")
+            chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=60).encode(
+                x=alt.X("xg:Q", title="Total xG (Attacking)"),
+                y=alt.Y("xga:Q", title="Total xGA (Against)"),
+                color=alt.value("#1f77b4"),
+                tooltip=["name", "xg", "xga"]
+            ).interactive().properties(height=400)
+            st.altair_chart(chart_xg_xga, use_container_width=True)
+
+        with col_s2:
+            st.markdown("**xGA vs. Defensive Actions**")
+            chart_def = alt.Chart(df_scatter).mark_circle(size=60).encode(
+                x=alt.X("defensive_actions:Q", title="Total Defensive Actions (Tackles + Ints)"),
+                y=alt.Y("xga:Q", title="Total xGA (Against)"),
+                color=alt.value("#ff7f0e"),
+                tooltip=["name", "defensive_actions", "xga"]
+            ).interactive().properties(height=400)
+            st.altair_chart(chart_def, use_container_width=True)
+
 
 def render_exports():
     st.header("Exports")
