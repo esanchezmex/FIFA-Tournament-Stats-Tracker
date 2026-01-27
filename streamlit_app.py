@@ -37,12 +37,15 @@ def render_create_game():
         game_label = st.text_input("Game label (ex: GAM1, GBM2)")
         col1, col2 = st.columns(2)
         with col1:
-            player_a_label = st.selectbox("Player A", list(player_options.keys()))
+            player_a_label = st.selectbox("Player A", list(player_options.keys()), index=None, placeholder="Select Player A")
         with col2:
-            player_b_label = st.selectbox("Player B", list(player_options.keys()), index=1 if len(player_options) > 1 else 0)
+            player_b_label = st.selectbox("Player B", list(player_options.keys()), index=None, placeholder="Select Player B")
         allow_draw = st.checkbox("Allow draw", value=True)
         submitted = st.form_submit_button("Create game")
         if submitted:
+            if player_a_label is None or player_b_label is None:
+                st.error("Please select both Player A and Player B.")
+                return
             player_a = player_options[player_a_label]
             player_b = player_options[player_b_label]
             ok, msg = logic.add_game(round_name, game_label, player_a, player_b, allow_draw)
