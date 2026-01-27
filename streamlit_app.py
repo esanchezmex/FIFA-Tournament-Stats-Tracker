@@ -180,8 +180,8 @@ def render_visualizations():
                 st.markdown("**Top 5 underperformers (lowest Goals - xG)**")
                 df_under = insights["goals_minus_xg_under"]
                 chart_under = alt.Chart(df_under).mark_bar(color="red").encode(
-                    x=alt.X("goals_minus_xg:Q", title="Goals - xG"),
-                    y=alt.Y("name:N", sort="x", title="Player"),
+                    x=alt.X("name:N", sort="y", title="Player"),
+                    y=alt.Y("goals_minus_xg:Q", title="Goals - xG"),
                     tooltip=["name", "goals_total", "total_xg", "goals_minus_xg"]
                 ).properties(height=300)
                 st.altair_chart(chart_under, use_container_width=True)
@@ -191,8 +191,8 @@ def render_visualizations():
                 st.markdown("**Top 5 overperformers (highest Goals - xG)**")
                 df_over = insights["goals_minus_xg_over"]
                 chart_over = alt.Chart(df_over).mark_bar(color="green").encode(
-                    x=alt.X("goals_minus_xg:Q", title="Goals - xG"),
-                    y=alt.Y("name:N", sort="-x", title="Player"),
+                    x=alt.X("name:N", sort="-y", title="Player"),
+                    y=alt.Y("goals_minus_xg:Q", title="Goals - xG"),
                     tooltip=["name", "goals_total", "total_xg", "goals_minus_xg"]
                 ).properties(height=300)
                 st.altair_chart(chart_over, use_container_width=True)
