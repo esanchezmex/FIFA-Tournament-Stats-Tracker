@@ -33,8 +33,8 @@ def render_create_game():
 
     player_options = {f"{row['name']} ({row['player_id']})": row["player_id"] for _, row in players.iterrows()}
     with st.form("create_game", clear_on_submit=True):
-        round_name = st.text_input("Round name (ex: Group Stage, QF, SF, Final)")
-        game_label = st.text_input("Game label (ex: Group A - match 1)")
+        round_name = st.text_input("Round name (GS, R16, QF, SF, Final)")
+        game_label = st.text_input("Game label (ex: GAM1, GBM2)")
         col1, col2 = st.columns(2)
         with col1:
             player_a_label = st.selectbox("Player A", list(player_options.keys()))
