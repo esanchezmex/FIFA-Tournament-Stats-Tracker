@@ -177,7 +177,7 @@ def render_visualizations():
         col1, col2 = st.columns(2)
         if "goals_minus_xg_under" in insights:
             with col1:
-                st.markdown("**Top 5 underperformers (lowest Goals - xG)**")
+                st.markdown("**Top 5 UNDERperformers (lowest Goals - xG)**")
                 df_under = insights["goals_minus_xg_under"]
                 chart_under = alt.Chart(df_under).mark_bar(color="red").encode(
                     x=alt.X("name:N", sort="y", title="Player"),
@@ -188,7 +188,7 @@ def render_visualizations():
 
         if "goals_minus_xg_over" in insights:
             with col2:
-                st.markdown("**Top 5 overperformers (highest Goals - xG)**")
+                st.markdown("**Top 5 OVERperformers (highest Goals - xG)**")
                 df_over = insights["goals_minus_xg_over"]
                 chart_over = alt.Chart(df_over).mark_bar(color="green").encode(
                     x=alt.X("name:N", sort="-y", title="Player"),
