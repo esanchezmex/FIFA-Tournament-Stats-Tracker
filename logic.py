@@ -235,28 +235,19 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
     game_totals = game_totals.merge(games[["game_id", "round_name", "allow_draw"]], on="game_id", how="left")
 
     # Average xG per game by round
+    # Enforce order: GS -> R16 -> QF -> SF -> Final
+    round_order = ["GS", "R16", "QF", "SF", "Final"]
     round_df = (
         game_totals.groupby("round_name")
         .agg(games=("game_id", "count"), avg_xg_per_game=("total_xg", "mean"))
         .reset_index()
-        .sort_values("avg_xg_per_game", ascending=False)
     )
+    # Order by category
+    round_df["round_name"] = pd.Categorical(round_df["round_name"], categories=round_order, ordered=True)
+    round_df = round_df.dropna(subset=["round_name"]).sort_values("round_name")
+    
     insights["avg_xg_by_round"] = round_df
 
-    # Average xG per game by stage proxy (draw allowed => group)
-    game_totals["allow_draw_flag"] = (
-        game_totals["allow_draw"].astype(str).str.lower().isin(["true", "1", "yes", "y"])
-    )
-    game_totals["stage"] = game_totals["allow_draw_flag"].apply(
-        lambda x: "Group stage (draws allowed)" if x else "Knockout"
-    )
-    stage_df = (
-        game_totals.groupby("stage")
-        .agg(games=("game_id", "count"), avg_xg_per_game=("total_xg", "mean"))
-        .reset_index()
-        .sort_values("avg_xg_per_game", ascending=False)
-    )
-    insights["avg_xg_by_stage"] = stage_df
 
     # Goals - xG per player (under/over performance)
     agg = aggregate_player_stats()

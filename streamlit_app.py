@@ -168,12 +168,8 @@ def render_visualizations():
     if "avg_xg_by_round" in insights:
         st.subheader("Average xG per game by round")
         round_df = insights["avg_xg_by_round"]
-        st.bar_chart(round_df.set_index("round_name")["avg_xg_per_game"])
+        st.line_chart(round_df.set_index("round_name")["avg_xg_per_game"])
 
-    if "avg_xg_by_stage" in insights:
-        st.subheader("Average xG per game by stage")
-        stage_df = insights["avg_xg_by_stage"]
-        st.bar_chart(stage_df.set_index("stage")["avg_xg_per_game"])
 
     if "goals_minus_xg_under" in insights or "goals_minus_xg_over" in insights:
         st.subheader("Goals minus xG (under/over performance)")
