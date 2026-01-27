@@ -264,6 +264,27 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
         insights["goals_minus_xg_over"] = perf_sorted.tail(5).sort_values("goals_minus_xg", ascending=False)
         insights["player_stats"] = agg
 
+    # New Scatter Plot Data: xG, xGA, and Defensive Actions
+    if not stats.empty:
+        # Calculate 'defensive_actions' first
+        stats["interceptions"] = pd.to_numeric(stats["interceptions"], errors="coerce").fillna(0)
+        stats["tackles"] = pd.to_numeric(stats["tackles"], errors="coerce").fillna(0)
+        stats["defensive_actions"] = stats["interceptions"] + stats["tackles"]
+        stats["xga"] = pd.to_numeric(stats["xga"], errors="coerce").fillna(0)
+
+        # Aggregate by player
+        scatter_df = stats.groupby("player_id").agg({
+            "xg": "sum",
+            "xga": "sum",
+            "defensive_actions": "sum"
+        }).reset_index()
+
+        # Merge with player names (assuming aggregate_player_stats or a list_players exists)
+        if not agg.empty:
+            scatter_df = scatter_df.merge(agg[["player_id", "name"]], on="player_id", how="left")
+        
+        insights["scatter_data"] = scatter_df
+    
     return insights
 
 

@@ -197,32 +197,31 @@ def render_visualizations():
                 ).properties(height=300)
                 st.altair_chart(chart_over, use_container_width=True)
 
-    if "player_stats" in insights:
+    if "scatter_data" in insights:
         st.divider()
-        st.subheader("Performance Comparison (Per Game)")
-        col1, col2 = st.columns(2)
-        
-        df_stats = insights["player_stats"]
-        
-        with col1:
-            st.markdown("**xG vs xGA**")
-            scatter1 = alt.Chart(df_stats).mark_circle(size=100).encode(
-                x=alt.X("avg_xg:Q", title="Avg xG per Game"),
-                y=alt.Y("avg_xga:Q", title="Avg xGA per Game"),
-                color=alt.value("#31333F"),
-                tooltip=["name", "avg_xg", "avg_xga", "games_played"]
-            ).interactive().properties(height=400)
-            st.altair_chart(scatter1, use_container_width=True)
+        st.subheader("Performance Analysis")
+        df_scatter = insights["scatter_data"]
+        col_s1, col_s2 = st.columns(2)
 
-        with col2:
-            st.markdown("**xGA vs Defensive Contributions**")
-            scatter2 = alt.Chart(df_stats).mark_circle(size=100).encode(
-                x=alt.X("avg_def_actions:Q", title="Avg Def Actions per Game"),
-                y=alt.Y("avg_xga:Q", title="Avg xGA per Game"),
-                color=alt.value("#31333F"),
-                tooltip=["name", "avg_def_actions", "avg_xga", "games_played"]
+        with col_s1:
+            st.markdown("**xG vs. xGA (Expected Contributions)**")
+            chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=60).encode(
+                x=alt.X("xg:Q", title="Total xG (Attacking)"),
+                y=alt.Y("xga:Q", title="Total xGA (Against)"),
+                color=alt.value("#1f77b4"),
+                tooltip=["name", "xg", "xga"]
             ).interactive().properties(height=400)
-            st.altair_chart(scatter2, use_container_width=True)
+            st.altair_chart(chart_xg_xga, use_container_width=True)
+
+        with col_s2:
+            st.markdown("**xGA vs. Defensive Actions**")
+            chart_def = alt.Chart(df_scatter).mark_circle(size=60).encode(
+                x=alt.X("defensive_actions:Q", title="Total Defensive Actions (Tackles + Ints)"),
+                y=alt.Y("xga:Q", title="Total xGA (Against)"),
+                color=alt.value("#ff7f0e"),
+                tooltip=["name", "defensive_actions", "xga"]
+            ).interactive().properties(height=400)
+            st.altair_chart(chart_def, use_container_width=True)
 
 
 def render_exports():
