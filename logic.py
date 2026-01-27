@@ -170,6 +170,7 @@ def aggregate_player_stats() -> pd.DataFrame:
         draws=("draw_flag", "sum"),
         losses=("loss_flag", "sum"),
         total_xg=("xg", "sum"),
+        total_xga=("xga", "sum"),
         avg_xga=("xga", "mean"),
         dribble_success_avg=("dribble_success", "mean"),
         goals_total=("goals", "sum"),
@@ -178,6 +179,9 @@ def aggregate_player_stats() -> pd.DataFrame:
         tackles_total=("tackles", "sum"),
         def_actions_total=("def_actions", "sum"),
     ).reset_index()
+
+    grouped["avg_xg"] = grouped["total_xg"] / grouped["games_played"]
+    grouped["avg_def_actions"] = grouped["def_actions_total"] / grouped["games_played"]
 
     merged = grouped.merge(players, on="player_id", how="left")
     return merged
@@ -258,6 +262,7 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
         perf_sorted = perf.sort_values("goals_minus_xg")
         insights["goals_minus_xg_under"] = perf_sorted.head(5)
         insights["goals_minus_xg_over"] = perf_sorted.tail(5).sort_values("goals_minus_xg", ascending=False)
+        insights["player_stats"] = agg
 
     return insights
 

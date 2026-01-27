@@ -197,6 +197,33 @@ def render_visualizations():
                 ).properties(height=300)
                 st.altair_chart(chart_over, use_container_width=True)
 
+    if "player_stats" in insights:
+        st.divider()
+        st.subheader("Performance Comparison (Per Game)")
+        col1, col2 = st.columns(2)
+        
+        df_stats = insights["player_stats"]
+        
+        with col1:
+            st.markdown("**xG vs xGA**")
+            scatter1 = alt.Chart(df_stats).mark_circle(size=100).encode(
+                x=alt.X("avg_xg:Q", title="Avg xG per Game"),
+                y=alt.Y("avg_xga:Q", title="Avg xGA per Game"),
+                color=alt.value("#31333F"),
+                tooltip=["name", "avg_xg", "avg_xga", "games_played"]
+            ).interactive().properties(height=400)
+            st.altair_chart(scatter1, use_container_width=True)
+
+        with col2:
+            st.markdown("**xGA vs Defensive Contributions**")
+            scatter2 = alt.Chart(df_stats).mark_circle(size=100).encode(
+                x=alt.X("avg_def_actions:Q", title="Avg Def Actions per Game"),
+                y=alt.Y("avg_xga:Q", title="Avg xGA per Game"),
+                color=alt.value("#31333F"),
+                tooltip=["name", "avg_def_actions", "avg_xga", "games_played"]
+            ).interactive().properties(height=400)
+            st.altair_chart(scatter2, use_container_width=True)
+
 
 def render_exports():
     st.header("Exports")
