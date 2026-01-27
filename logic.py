@@ -20,6 +20,35 @@ def list_games() -> pd.DataFrame:
     return storage.load_games()
 
 
+def get_games_with_results() -> pd.DataFrame:
+    games = list_games()
+    stats = list_stats()
+    players = list_players().set_index("player_id")
+
+    if games.empty:
+        return pd.DataFrame()
+
+    # Create a scores dataframe from stats
+    # Each game has 2 entries in stats
+    if not stats.empty:
+        scores = stats.groupby("game_id").apply(
+            lambda x: pd.Series({
+                "score_a": x[x["player_id"] == games.set_index("game_id").loc[x.name, "player_a"]]["goals"].values[0] if not x[x["player_id"] == games.set_index("game_id").loc[x.name, "player_a"]].empty else None,
+                "score_b": x[x["player_id"] == games.set_index("game_id").loc[x.name, "player_b"]]["goals"].values[0] if not x[x["player_id"] == games.set_index("game_id").loc[x.name, "player_b"]].empty else None,
+            })
+        ).reset_index()
+        games = games.merge(scores, on="game_id", how="left")
+    else:
+        games["score_a"] = None
+        games["score_b"] = None
+
+    # Add player names
+    games["name_a"] = games["player_a"].map(players["name"])
+    games["name_b"] = games["player_b"].map(players["name"])
+
+    return games
+
+
 def list_stats() -> pd.DataFrame:
     storage.ensure_data_files()
     return storage.load_stats()

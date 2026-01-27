@@ -219,10 +219,61 @@ def render_exports():
     st.download_button("Download leaderboards CSV", lb_buffer.getvalue(), file_name="leaderboards.csv")
 
 
+def render_bracket():
+    st.header("Tournament Bracket")
+    games = logic.get_games_with_results()
+    
+    if games.empty:
+        st.info("No games created yet. Go to 'Players & Games' to add some.")
+        return
+
+    # Group Stage
+    st.subheader("Group Stage (GS)")
+    gs_games = games[games["round_name"] == "GS"]
+    if gs_games.empty:
+        st.write("No Group Stage matches scheduled.")
+    else:
+        for _, row in gs_games.iterrows():
+            score = f"{int(row['score_a'])} - {int(row['score_b'])}" if pd.notnull(row["score_a"]) else "vs"
+            st.write(f"**{row['game_label']}**: {row['name_a']} {score} {row['name_b']}")
+
+    st.divider()
+
+    # Knockout Rounds
+    st.subheader("Knockout Stage")
+    knockout_rounds = ["R16", "QF", "SF", "Final"]
+    cols = st.columns(len(knockout_rounds))
+
+    for i, round_name in enumerate(knockout_rounds):
+        with cols[i]:
+            st.markdown(f"### {round_name}")
+            round_games = games[games["round_name"] == round_name]
+            if round_games.empty:
+                st.caption(f"No {round_name} matches.")
+            else:
+                for _, row in round_games.iterrows():
+                    with st.container(border=True):
+                        score_a = int(row["score_a"]) if pd.notnull(row["score_a"]) else "?"
+                        score_b = int(row["score_b"]) if pd.notnull(row["score_b"]) else "?"
+                        
+                        # Highlight winner if game was played
+                        name_a = row["name_a"]
+                        name_b = row["name_b"]
+                        if pd.notnull(row["score_a"]):
+                            if row["score_a"] > row["score_b"]:
+                                name_a = f"**{name_a}** 🏆"
+                            elif row["score_b"] > row["score_a"]:
+                                name_b = f"**{name_b}** 🏆"
+
+                        st.markdown(f"{name_a}  \n`{score_a}`")
+                        st.markdown(f"{name_b}  \n`{score_b}`")
+                        st.caption(f"Label: {row['game_label']}")
+
+
 def main():
     st.title("FIFA Tourney Stats")
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["Players & Games", "Enter Stats", "Leaderboards", "Visualizations", "Exports"]
+    tab1, tab2, tab_bracket, tab3, tab4, tab5 = st.tabs(
+        ["Players & Games", "Enter Stats", "Bracket", "Leaderboards", "Visualizations", "Exports"]
     )
     with tab1:
         render_create_player()
@@ -230,6 +281,8 @@ def main():
         render_create_game()
     with tab2:
         render_enter_stats()
+    with tab_bracket:
+        render_bracket()
     with tab3:
         render_leaderboards()
     with tab4:
