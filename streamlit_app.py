@@ -204,7 +204,7 @@ def render_visualizations():
         col_s1, col_s2 = st.columns(2)
 
         with col_s1:
-            st.markdown("**xG vs. xGA (Above the line = Expected to win)**")
+            st.markdown("     **xG vs. xGA (Above the line = Expected to win)**")
             chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("xga:Q", title="Total xGA (Against)"),
                 y=alt.Y("xg:Q", title="Total xG (Attacking)"),
@@ -226,7 +226,7 @@ def render_visualizations():
             st.altair_chart(chart_xg_xga + line, use_container_width=True)
 
         with col_s2:
-            st.markdown("**xGA vs. Defensive Action (Do high defensive actions lead to less xG Conceded?**")
+            st.markdown("     **xGA vs. Defensive Action (Do high defensive actions lead to less xG Conceded?**")
             chart_def = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("defensive_actions:Q", title="Total Defensive Actions (Tackles + Ints)"),
                 y=alt.Y("xga:Q", title="Total xGA (Against)"),
@@ -242,7 +242,7 @@ def render_visualizations():
         col_s3, col_s4 = st.columns(2)
 
         with col_s3:
-            st.markdown("**Goals vs. xG (Does xG actually predict goals?)**")
+            st.markdown("     **Goals vs. xG (Does xG actually predict goals?)**")
             max_g_xg = float(max(df_scatter["goals"].max(), df_scatter["xg"].max(), 1))
             line_data_goals = pd.DataFrame({"x": [0, max_g_xg], "y": [0, max_g_xg]})
 
@@ -260,7 +260,7 @@ def render_visualizations():
             st.altair_chart((scatter_goals + goal_line).interactive(), use_container_width=True)
 
         with col_s4:
-            st.markdown("**xG vs. Key Passes (Does passing ability predict xG?)**")
+            st.markdown("     **xG vs. Key Passes (Does passing ability predict xG?)**")
             chart_kp = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("key_passes:Q", title="Key Passes"),
                 y=alt.Y("xg:Q", title="Total xG"),
