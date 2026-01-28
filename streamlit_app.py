@@ -226,7 +226,7 @@ def render_visualizations():
             st.altair_chart(chart_xg_xga + line, use_container_width=True)
 
         with col_s2:
-            st.markdown("**xGA vs. Defensive Actions**")
+            st.markdown("**xGA vs. Defensive Action (Do high defensive actions lead to less xG Conceded?**")
             chart_def = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("defensive_actions:Q", title="Total Defensive Actions (Tackles + Ints)"),
                 y=alt.Y("xga:Q", title="Total xGA (Against)"),
@@ -242,17 +242,7 @@ def render_visualizations():
         col_s3, col_s4 = st.columns(2)
 
         with col_s3:
-            st.markdown("**xG vs. Key Passes**")
-            chart_kp = alt.Chart(df_scatter).mark_circle(size=150).encode(
-                x=alt.X("key_passes:Q", title="Key Passes"),
-                y=alt.Y("xg:Q", title="Total xG"),
-                color=alt.value("#8e44ad"),
-                tooltip=["name", "key_passes", "xg"]
-            ).interactive()
-            st.altair_chart(chart_kp, use_container_width=True)
-
-        with col_s4:
-            st.markdown("**Goals vs. xG (Finishing Ability)**")
+            st.markdown("**Goals vs. xG (Does xG actually predict goals?)**")
             max_g_xg = float(max(df_scatter["goals"].max(), df_scatter["xg"].max(), 1))
             line_data_goals = pd.DataFrame({"x": [0, max_g_xg], "y": [0, max_g_xg]})
 
@@ -268,6 +258,17 @@ def render_visualizations():
             ).encode(x="x:Q", y="y:Q")
 
             st.altair_chart((scatter_goals + goal_line).interactive(), use_container_width=True)
+
+        with col_s4:
+            st.markdown("**xG vs. Key Passes (Does passing ability predict xG?)**")
+            chart_kp = alt.Chart(df_scatter).mark_circle(size=150).encode(
+                x=alt.X("key_passes:Q", title="Key Passes"),
+                y=alt.Y("xg:Q", title="Total xG"),
+                color=alt.value("#8e44ad"),
+                tooltip=["name", "key_passes", "xg"]
+            ).interactive()
+            st.altair_chart(chart_kp, use_container_width=True)
+            
 
 
 def render_exports():
