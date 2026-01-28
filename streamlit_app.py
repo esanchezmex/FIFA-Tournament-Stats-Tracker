@@ -204,14 +204,22 @@ def render_visualizations():
         col_s1, col_s2 = st.columns(2)
 
         with col_s1:
-            st.markdown("**xG vs. xGA (Expected Contributions)**")
+            st.markdown("**xG vs. xGA (Above the line = Expected to win)**")
             chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=60).encode(
                 x=alt.X("xg:Q", title="Total xG (Attacking)"),
                 y=alt.Y("xga:Q", title="Total xGA (Against)"),
                 color=alt.value("#1f77b4"),
                 tooltip=["name", "xg", "xga"]
             ).interactive().properties(height=400)
-            st.altair_chart(chart_xg_xga, use_container_width=True)
+            line = alt.Chart(line_data).mark_line(
+                color="gray", 
+                strokeDash=[5, 5], 
+                opacity=0.5
+            ).encode(
+                x="x:Q",
+                y="y:Q"
+            )
+            st.altair_chart(chart_xg_xga + line, use_container_width=True)
 
         with col_s2:
             st.markdown("**xGA vs. Defensive Actions**")
