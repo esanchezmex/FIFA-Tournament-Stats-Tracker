@@ -211,6 +211,9 @@ def render_visualizations():
                 color=alt.value("#1f77b4"),
                 tooltip=["name", "xg", "xga"]
             ).interactive().properties(height=400)
+            
+            max_val = float(max(df_scatter["xg"].max(), df_scatter["xga"].max(), 1))
+            line_data = pd.DataFrame({"x": [0, max_val], "y": [0, max_val]})
             line = alt.Chart(line_data).mark_line(
                 color="gray", 
                 strokeDash=[5, 5], 
