@@ -243,26 +243,24 @@ def render_visualizations():
 
         with col_s3:
             st.markdown("**xG vs. Key Passes**")
-            # Shows creators: High Key Passes + High xG = Elite Playmakers
             chart_kp = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("key_passes:Q", title="Key Passes"),
                 y=alt.Y("xg:Q", title="Total xG"),
-                color=alt.value("#8e44ad"), # Purple
+                color=alt.value("#8e44ad"),
                 tooltip=["name", "key_passes", "xg"]
             ).interactive()
             st.altair_chart(chart_kp, use_container_width=True)
 
         with col_s4:
             st.markdown("**Goals vs. xG (Finishing Ability)**")
-            # 1:1 line data for this specific chart
-            max_g_xg = float(max(df_scatter["goals_total"].max(), df_scatter["xg"].max(), 1))
+            max_g_xg = float(max(df_scatter["goals"].max(), df_scatter["xg"].max(), 1))
             line_data_goals = pd.DataFrame({"x": [0, max_g_xg], "y": [0, max_g_xg]})
 
             scatter_goals = alt.Chart(df_scatter).mark_circle(size=150).encode(
                 x=alt.X("xg:Q", title="Expected Goals (xG)"),
-                y=alt.Y("goals_total:Q", title="Actual Goals"),
-                color=alt.value("#27ae60"), # Green
-                tooltip=["name", "goals_total", "xg"]
+                y=alt.Y("goals:Q", title="Actual Goals"),
+                color=alt.value("#27ae60"),
+                tooltip=["name", "goals", "xg"]
             )
 
             goal_line = alt.Chart(line_data_goals).mark_line(
