@@ -205,7 +205,7 @@ def render_visualizations():
 
         with col_s1:
             st.markdown("**xG vs. xGA (Above the line = Expected to win)**")
-            chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=300).encode(
+            chart_xg_xga = alt.Chart(df_scatter).mark_circle(size=200).encode(
                 x=alt.X("xga:Q", title="Total xGA (Against)"),
                 y=alt.Y("xg:Q", title="Total xG (Attacking)"),
                 color=alt.value("#1f77b4"),
@@ -217,7 +217,8 @@ def render_visualizations():
             line = alt.Chart(line_data).mark_line(
                 color="gray", 
                 strokeDash=[5, 5], 
-                opacity=0.5
+                opacity=0.5,
+                strokeWidth=4
             ).encode(
                 x="x:Q",
                 y="y:Q"
@@ -226,7 +227,7 @@ def render_visualizations():
 
         with col_s2:
             st.markdown("**xGA vs. Defensive Actions**")
-            chart_def = alt.Chart(df_scatter).mark_circle(size=300).encode(
+            chart_def = alt.Chart(df_scatter).mark_circle(size=200).encode(
                 x=alt.X("defensive_actions:Q", title="Total Defensive Actions (Tackles + Ints)"),
                 y=alt.Y("xga:Q", title="Total xGA (Against)"),
                 color=alt.value("#ff7f0e"),
