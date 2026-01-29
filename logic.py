@@ -7,6 +7,7 @@ import pandas as pd
 import storage
 
 MIN_GAMES_FOR_AVERAGES = 4
+SUPPORTED_ROUNDS = ["R64", "R32", "R16", "QF", "SF", "Final"]
 
 
 def list_players() -> pd.DataFrame:
@@ -68,7 +69,7 @@ def add_player(name: str) -> Tuple[bool, str]:
     return True, player_id
 
 
-def add_game(round_name: str, game_label: str, player_a: str, player_b: str, allow_draw: bool) -> Tuple[bool, str]:
+def add_game(round_name: str, game_label: str, player_a: str, player_b: str) -> Tuple[bool, str]:
     players = list_players()
     if player_a == player_b:
         return False, "Players must be different."
@@ -86,7 +87,7 @@ def add_game(round_name: str, game_label: str, player_a: str, player_b: str, all
         "game_label": game_label.strip(),
         "player_a": player_a,
         "player_b": player_b,
-        "allow_draw": allow_draw,
+        "allow_draw": False,
         "played_at": "",
     }
     updated = pd.concat([games, pd.DataFrame([new_row])], ignore_index=True)
@@ -121,11 +122,10 @@ def record_game_stats(game_id: str, entries: List[Dict]) -> Tuple[bool, str]:
     if expected_players != provided_players:
         return False, "Entries must match the two players scheduled for this game."
 
-    # Enforce draw rule
-    allow_draw = bool(row["allow_draw"])
+    # Enforce no draws
     results = {e.get("result") for e in entries}
-    if not allow_draw and "draw" in results:
-        return False, "Draws are not allowed for this game."
+    if "draw" in results:
+        return False, "Draws are not allowed."
 
     # Ensure xGA matches opponent xG
     first, second = entries
@@ -239,8 +239,8 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
     game_totals = game_totals.merge(games[["game_id", "round_name", "allow_draw"]], on="game_id", how="left")
 
     # Average xG per game by round
-    # Enforce order: R16 -> QF -> SF -> Final
-    round_order = ["R16", "QF", "SF", "Final"]
+    # Enforce order using SUPPORTED_ROUNDS
+    round_order = SUPPORTED_ROUNDS
     round_df = (
         game_totals.groupby("round_name")
         .agg(games=("game_id", "count"), avg_xg_per_game=("total_xg", "mean"))

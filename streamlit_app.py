@@ -34,14 +34,13 @@ def render_create_game():
 
     player_options = {f"{row['name']} ({row['player_id']})": row["player_id"] for _, row in players.iterrows()}
     with st.form("create_game", clear_on_submit=True):
-        round_name = st.text_input("Round name (GS, R16, QF, SF, Final)")
+        round_name = st.selectbox("Round name", logic.SUPPORTED_ROUNDS)
         game_label = st.text_input("Game label (ex: GAM1, GBM2)")
         col1, col2 = st.columns(2)
         with col1:
             player_a_label = st.selectbox("Player A", list(player_options.keys()), index=None, placeholder="Select Player A")
         with col2:
             player_b_label = st.selectbox("Player B", list(player_options.keys()), index=None, placeholder="Select Player B")
-        allow_draw = st.checkbox("Allow draw", value=True)
         submitted = st.form_submit_button("Create game")
         if submitted:
             if player_a_label is None or player_b_label is None:
@@ -49,7 +48,7 @@ def render_create_game():
                 return
             player_a = player_options[player_a_label]
             player_b = player_options[player_b_label]
-            ok, msg = logic.add_game(round_name, game_label, player_a, player_b, allow_draw)
+            ok, msg = logic.add_game(round_name, game_label, player_a, player_b)
             if ok:
                 st.success(f"Created game {msg}")
             else:
@@ -73,8 +72,6 @@ def render_enter_stats():
     game = options[selected_label]
     pid_a, pid_b = game["player_a"], game["player_b"]
     name_a, name_b = players.loc[pid_a, "name"], players.loc[pid_b, "name"]
-
-    allow_draw = bool(game["allow_draw"])
     with st.form("enter_stats", clear_on_submit=True):
         st.subheader(f"{name_a}")
         xg_a = st.number_input(f"{name_a} xG", min_value=0.0, value=0.0, step=0.1, key="xg_a")
@@ -99,10 +96,8 @@ def render_enter_stats():
             elif goals_b > goals_a:
                 result_a, result_b = "loss", "win"
             else:
-                if not allow_draw:
-                    st.error("Draws are not allowed for this game. Please enter a decisive score.")
-                    return
-                result_a, result_b = "draw", "draw"
+                st.error("Draws are not allowed. Please enter a decisive score.")
+                return
 
             entries = [
                 {
@@ -308,9 +303,17 @@ def render_bracket():
         st.info("No games created yet. Go to 'Players & Games' to add some.")
         return
 
-    # Knockout Rounds
+    # Knockout Stage
     st.subheader("Knockout Stage")
-    knockout_rounds = ["R16", "QF", "SF", "Final"]
+    
+    # Dynamically determine which rounds to show based on existing games
+    existing_rounds = set(games["round_name"].unique())
+    knockout_rounds = [r for r in logic.SUPPORTED_ROUNDS if r in existing_rounds]
+    
+    if not knockout_rounds:
+        st.info("No knockout games scheduled yet.")
+        return
+
     cols = st.columns(len(knockout_rounds))
 
     for i, round_name in enumerate(knockout_rounds):
