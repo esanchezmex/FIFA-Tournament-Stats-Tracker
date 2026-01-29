@@ -239,8 +239,8 @@ def tournament_insights() -> Dict[str, pd.DataFrame]:
     game_totals = game_totals.merge(games[["game_id", "round_name", "allow_draw"]], on="game_id", how="left")
 
     # Average xG per game by round
-    # Enforce order: GS -> R16 -> QF -> SF -> Final
-    round_order = ["GS", "R16", "QF", "SF", "Final"]
+    # Enforce order: R16 -> QF -> SF -> Final
+    round_order = ["R16", "QF", "SF", "Final"]
     round_df = (
         game_totals.groupby("round_name")
         .agg(games=("game_id", "count"), avg_xg_per_game=("total_xg", "mean"))

@@ -92,19 +92,17 @@ def render_enter_stats():
         interceptions_b = st.number_input(f"{name_b} interceptions", min_value=0, value=0, step=1, key="int_b")
         tackles_b = st.number_input(f"{name_b} tackles", min_value=0, value=0, step=1, key="tkl_b")
 
-        result_choice = st.radio(
-            "Result",
-            [f"{name_a} win", f"{name_b} win"] + (["Draw"] if allow_draw else []),
-            horizontal=True,
-        )
         submitted = st.form_submit_button("Save stats")
         if submitted:
-            if result_choice.startswith(name_a):
+            if goals_a > goals_b:
                 result_a, result_b = "win", "loss"
-            elif result_choice.startswith(name_b):
+            elif goals_b > goals_a:
                 result_a, result_b = "loss", "win"
             else:
-                result_a = result_b = "draw"
+                if not allow_draw:
+                    st.error("Draws are not allowed for this game. Please enter a decisive score.")
+                    return
+                result_a, result_b = "draw", "draw"
 
             entries = [
                 {
@@ -309,18 +307,6 @@ def render_bracket():
     if games.empty:
         st.info("No games created yet. Go to 'Players & Games' to add some.")
         return
-
-    # Group Stage
-    st.subheader("Group Stage (GS)")
-    gs_games = games[games["round_name"] == "GS"]
-    if gs_games.empty:
-        st.write("No Group Stage matches scheduled.")
-    else:
-        for _, row in gs_games.iterrows():
-            score = f"{int(row['score_a'])} - {int(row['score_b'])}" if pd.notnull(row["score_a"]) else "vs"
-            st.write(f"**{row['game_label']}**: {row['name_a']} {score} {row['name_b']}")
-
-    st.divider()
 
     # Knockout Rounds
     st.subheader("Knockout Stage")
