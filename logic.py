@@ -79,7 +79,15 @@ def add_game(round_name: str, game_label: str, player_a: str, player_b: str) -> 
         return False, "Game label cannot be empty."
     if player_a not in set(players["player_id"]) or player_b not in set(players["player_id"]):
         return False, "Invalid player id(s)."
+    
     games = list_games()
+    
+    # Enforce unique game labels
+    if not games.empty:
+        existing_labels = set(games["game_label"].str.strip().str.upper())
+        if game_label.strip().upper() in existing_labels:
+            return False, f"Game label '{game_label}' already exists. Please use a unique label."
+
     game_id = storage.next_id(games, "game_id", "G")
     new_row = {
         "game_id": game_id,
