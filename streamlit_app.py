@@ -35,7 +35,7 @@ def render_create_game():
     player_options = {f"{row['name']} ({row['player_id']})": row["player_id"] for _, row in players.iterrows()}
     with st.form("create_game", clear_on_submit=True):
         round_name = st.selectbox("Round name", logic.SUPPORTED_ROUNDS)
-        game_label = st.text_input("Game label (ex: GAM1, GBM2)")
+        game_label = st.text_input("Game label (ex: R32M18, R16M1, SFM2)")
         col1, col2 = st.columns(2)
         with col1:
             player_a_label = st.selectbox("Player A", list(player_options.keys()), index=None, placeholder="Select Player A")
