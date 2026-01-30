@@ -6,7 +6,7 @@ import pandas as pd
 
 import storage
 
-MIN_GAMES_FOR_AVERAGES = 4
+MIN_GAMES_FOR_AVERAGES = 2
 SUPPORTED_ROUNDS = ["R64", "R32", "R16", "QF", "SF", "Final"]
 
 
